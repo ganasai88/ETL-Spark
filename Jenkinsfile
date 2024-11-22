@@ -21,6 +21,22 @@ pipeline {
 
             }
         }
+        stage('SonarQube Analysis') {
+                     steps {
+                         script {
+                                 sh '''
+                                 docker run --rm -e SONAR_HOST_URL=http://18.117.71.55:9000/ \
+                                 -e SONAR_LOGIN=sqp_b32477c8d2b442414c295034a210a75cc79bcf8f \
+                                 -v /var/lib/jenkins/workspace/EMR-Spark:/usr/src \
+                                 sonarsource/sonar-scanner-cli \
+                                 -Dsonar.projectKey=EMR-Spark \
+                                 -Dsonar.sources=. \
+                                 -Dsonar.host.url=http://18.117.71.55:9000/ \
+                                 -Dsonar.login=sqp_b32477c8d2b442414c295034a210a75cc79bcf8f \
+                                 '''
+                         }
+                     }
+        }
         stage('Upload Files to S3') {
             steps {
                  script {
