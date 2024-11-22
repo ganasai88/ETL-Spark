@@ -150,7 +150,9 @@ pipeline {
                     def stepStatus = ""
                     def isStepCompleted = false
 
-                    while (!isStepCompleted) {
+
+
+                    while (isStepCompleted == '') {
                         // Execute the command and capture the output
                         def statusResult = sh(script: getStepStatusCommand, returnStdout: true).trim()
                         echo "Step status result: ${statusResult}"
@@ -164,7 +166,6 @@ pipeline {
                             isStepCompleted = true
                         } else if (stepStatus == 'FAILED') {
                             echo "Step failed."
-                            isStepCompleted = true
                             error "EMR step failed with Step ID: ${env.STEP_ID}"
                         } else {
                             echo "Step is still in state: ${stepStatus}. Waiting for completion..."
