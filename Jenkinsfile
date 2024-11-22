@@ -40,15 +40,22 @@ pipeline {
         stage('Upload Files to S3') {
             steps {
                  script {
+                        sh '''
+                            # Change to the directory containing the .py files
+                            cd monthly/22-11-2024
 
-                     sh '''
-                     cd monthly/22-11-2024 && zip -j py_files_22-11-2024.zip *.py
-                     echo "Zip file created successfully: py_files_22-11-2024.zip"
-                     echo "Uploading files to S3 bucket ${S3_BUCKET}..."
-                     # Sync the code to S3
-                     aws s3 sync . s3://${S3_BUCKET} --exclude ".git/*"
-                     echo "Files uploaded successfully!"
-                     '''
+                            # Zip the .py files and overwrite if exists
+                            zip -jo py_files_22-11-2024.zip *.py
+                            echo "Zip file created successfully: py_files_22-11-2024.zip"
+
+                            # Upload everything to S3 bucket, including updated zip and other files, ensuring overwrite
+                            echo "Uploading files to S3 bucket ${S3_BUCKET}..."
+
+                            # Sync the code to S3, include all files and exclude .git
+                            aws s3 sync . s3://${S3_BUCKET}/monthly/22-11-2024/ --exact-timestamps --exclude ".git/*"
+
+                            echo "Files uploaded successfully!"
+                        '''
                  }
             }
         }
