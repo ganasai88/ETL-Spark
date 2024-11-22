@@ -1,3 +1,6 @@
+import groovy.json.JsonSlurper
+import java.util.HashMap
+
 pipeline {
     agent any
 
@@ -172,17 +175,18 @@ pipeline {
                 }
             }
         }
-        // Non-CPS method to handle JSON parsing and state extraction
-        @NonCPS
-        def getStepState(String statusResult) {
-            // Parse the JSON result
-            def jsonResponse = new JsonSlurper().parseText(statusResult)
-
-            // Convert LazyMap to HashMap to avoid serialization issues
-            def serializableResponse = new HashMap(jsonResponse)
-
-            // Get the step state from the serializable response
-            return serializableResponse.Step.Status.State
-        }
     }
 }
+// Non-CPS method to handle JSON parsing and state extraction
+@NonCPS
+def getStepState(String statusResult) {
+    // Parse the JSON result
+    def jsonResponse = new JsonSlurper().parseText(statusResult)
+
+    // Convert LazyMap to HashMap to avoid serialization issues
+    def serializableResponse = new HashMap(jsonResponse)
+
+    // Get the step state from the serializable response
+    return serializableResponse.Step.Status.State
+}
+
