@@ -40,12 +40,9 @@ pipeline {
         stage('Upload Files to S3') {
             steps {
                  script {
+
                      sh '''
-                     echo "Zipping all .py files in monthly/22-11-2024..."
-
-                     # Create a zip file containing all .py files in the directory
-                     zip -r monthly/22-11-2024/py_files_22-11-2024.zip monthly/22-11-2024/*.py
-
+                     cd monthly/22-11-2024 && zip -j py_files_22-11-2024.zip *.py
                      echo "Zip file created successfully: py_files_22-11-2024.zip"
                      echo "Uploading files to S3 bucket ${S3_BUCKET}..."
                      # Sync the code to S3
@@ -90,9 +87,8 @@ pipeline {
                                        "ActionOnFailure": "CONTINUE",
                                        "Args": [
                                            "--deploy-mode", "cluster",
-                                            "--master", "yarn",
-                                            "s3://${S3_BUCKET}/monthly/22-11-2024/main.py",
                                            "--py-files","s3://${S3_BUCKET}/monthly/22-11-2024/py_files_22-11-2024.zip",
+                                           "s3://${S3_BUCKET}/monthly/22-11-2024/main.py",
                                            "--json_file_path", "s3a://${S3_BUCKET}/monthly/22-11-2024/configurations/config.json"
                                        ]
                                    }]' \
