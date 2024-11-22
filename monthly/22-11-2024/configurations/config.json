@@ -1,0 +1,22 @@
+{
+  "file_input": [
+    {
+      "source_type": "s3",
+      "table_name": "Restaurant_Violations",
+      "file_path": "s3a://mynewsparkbucket/monthly/2024-11-16/input/Food_Establishment_Inspection_Data_20240717.csv"
+    }
+  ],
+  "transform": [
+    {
+      "table_name": "result",
+      "sql": "SELECT * FROM table_name"
+    }
+  ],
+  "file_output": [
+    {
+      "source_type": "s3",
+      "table_name": "result",
+      "file_path": "s3a://mynewsparkbucket/monthly/2024-11-16/output/"
+    }
+  ]
+}
