@@ -122,13 +122,6 @@ pipeline {
                 }
             }
         }
-        stage('Step Status'){
-            steps{
-                script{
 
-
-                }
-            }
-        }
     }
 }
