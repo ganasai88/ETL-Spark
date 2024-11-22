@@ -107,18 +107,28 @@ pipeline {
                    // Log the output for debugging
                    echo "Add step result: ${result}"
 
-                   // Extract the step ID from the result (assuming the output contains the Step ID)
-                   def stepId = result.tokenize(' ').find { it.startsWith('step-id=') }.split('=')[1]
+                   // Parse the JSON output to get the step-id
+                   def stepId = null
+                   try {
+                       def jsonResponse = readJSON text: result
+                       stepId = jsonResponse.StepIds[0] // Extract the first step-id from the StepIds array
+                   } catch (Exception e) {
+                       error "Failed to parse the step ID from the response: ${e.message}"
+                   }
 
-                   // Save the timestamp and step ID for later use
-                   def timestamp = new Date().format('yyyy-MM-dd HH:mm:ss')
-                   currentBuild.description = "Step added at: ${timestamp} with Step ID: ${stepId}"
+                   if (stepId) {
+                       // Save the timestamp and step ID for later use
+                       def timestamp = new Date().format('yyyy-MM-dd HH:mm:ss')
+                       currentBuild.description = "Step added at: ${timestamp} with Step ID: ${stepId}"
 
-                   // Store the stepId as an environment variable for use in the next stage
-                   env.STEP_ID = stepId
-                   env.TIMESTAMP = timestamp
+                       // Store the stepId as an environment variable for use in the next stage
+                       env.STEP_ID = stepId
+                       env.TIMESTAMP = timestamp
 
-                   echo "Step added to EMR Cluster ID: ${env.CLUSTER_ID} at ${timestamp}, Step ID: ${stepId}"
+                       echo "Step added to EMR Cluster ID: ${env.CLUSTER_ID} at ${timestamp}, Step ID: ${stepId}"
+                   } else {
+                       error "Step ID not found in the output"
+                   }
                 }
             }
         }
