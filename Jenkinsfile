@@ -155,8 +155,11 @@ pipeline {
                         // Parse the JSON result
                         def jsonResponse = new groovy.json.JsonSlurper().parseText(statusResult)
 
-                        // Get the step state from the JSON response
-                        stepStatus = jsonResponse.Step.Status.State
+                        // Convert LazyMap to HashMap to avoid serialization issues
+                        def serializableResponse = new HashMap(jsonResponse)
+
+                        // Get the step state from the serializable response
+                        stepStatus = serializableResponse.Step.Status.State
 
                         // Check if the step has completed or failed
                         if (stepStatus == 'COMPLETED') {
