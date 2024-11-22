@@ -129,6 +129,51 @@ pipeline {
                 }
             }
         }
+        stage('Get Step Status') {
+            steps {
+                script {
+                    // Use the saved step ID from the previous stage
+                    echo "Retrieving status for Step ID: ${env.STEP_ID}"
 
+                    // Command to get step status using the saved Step ID
+                    def getStepStatusCommand = """
+                        aws emr describe-step \
+                            --cluster-id ${env.CLUSTER_ID} \
+                            --step-id ${env.STEP_ID} \
+                            --region ${REGION}
+                    """
+
+                    // Loop to continuously check the step status
+                    def stepStatus = ""
+                    def isStepCompleted = false
+
+                    while (!isStepCompleted) {
+                        // Execute the command and capture the output
+                        def statusResult = sh(script: getStepStatusCommand, returnStdout: true).trim()
+                        echo "Step status result: ${statusResult}"
+
+                        // Parse the JSON result
+                        def jsonResponse = new groovy.json.JsonSlurper().parseText(statusResult)
+
+                        // Get the step state from the JSON response
+                        stepStatus = jsonResponse.Step.Status.State
+
+                        // Check if the step has completed or failed
+                        if (stepStatus == 'COMPLETED') {
+                            echo "Step completed successfully."
+                            isStepCompleted = true
+                        } else if (stepStatus == 'FAILED') {
+                            echo "Step failed."
+                            isStepCompleted = true
+                            error "EMR step failed with Step ID: ${env.STEP_ID}"
+                        } else {
+                            echo "Step is still in state: ${stepStatus}. Waiting for completion..."
+                            // Wait before checking again
+                            sleep(30) // Wait for 30 seconds before rechecking
+                        }
+                    }
+                }
+            }
+        }
     }
 }
