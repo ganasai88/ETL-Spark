@@ -152,14 +152,8 @@ pipeline {
                         def statusResult = sh(script: getStepStatusCommand, returnStdout: true).trim()
                         echo "Step status result: ${statusResult}"
 
-                        // Parse the JSON result
-                        def jsonResponse = new groovy.json.JsonSlurper().parseText(statusResult)
-
-                        // Convert LazyMap to HashMap to avoid serialization issues
-                        def serializableResponse = new HashMap(jsonResponse)
-
-                        // Get the step state from the serializable response
-                        stepStatus = serializableResponse.Step.Status.State
+                        // Call the method that processes the result in a non-CPS context
+                        stepStatus = getStepState(statusResult)
 
                         // Check if the step has completed or failed
                         if (stepStatus == 'COMPLETED') {
@@ -177,6 +171,18 @@ pipeline {
                     }
                 }
             }
+        }
+        // Non-CPS method to handle JSON parsing and state extraction
+        @NonCPS
+        def getStepState(String statusResult) {
+            // Parse the JSON result
+            def jsonResponse = new JsonSlurper().parseText(statusResult)
+
+            // Convert LazyMap to HashMap to avoid serialization issues
+            def serializableResponse = new HashMap(jsonResponse)
+
+            // Get the step state from the serializable response
+            return serializableResponse.Step.Status.State
         }
     }
 }
