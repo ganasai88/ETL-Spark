@@ -132,7 +132,7 @@ pipeline {
                 }
             }
         }
-        stage('Get Step Status') {
+        stage('Step Completed Successfully') {
             steps {
                 script {
                     // Use the saved step ID from the previous stage
