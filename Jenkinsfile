@@ -26,13 +26,13 @@ pipeline {
                          script {
                                  sh '''
                                  docker run --rm -e SONAR_HOST_URL=http://18.117.71.55:9000/ \
-                                 -e SONAR_LOGIN=sqp_b32477c8d2b442414c295034a210a75cc79bcf8f \
-                                 -v /var/lib/jenkins/workspace/EMR-Spark:/usr/src \
+                                 -e SONAR_LOGIN=sqp_8c2e771f33cbe36bb53dc30cb568db790a2736c7 \
+                                 -v /var/lib/jenkins/workspace/Spark-Multi:/usr/src \
                                  sonarsource/sonar-scanner-cli \
-                                 -Dsonar.projectKey=EMR-Spark \
+                                 -Dsonar.projectKey=ETL-Pyspark \
                                  -Dsonar.sources=. \
                                  -Dsonar.host.url=http://18.117.71.55:9000/ \
-                                 -Dsonar.login=sqp_b32477c8d2b442414c295034a210a75cc79bcf8f \
+                                 -Dsonar.login=sqp_8c2e771f33cbe36bb53dc30cb568db790a2736c7 \
                                  '''
                          }
                      }
@@ -89,9 +89,11 @@ pipeline {
                                        "Name": "${STEP_NAME}",
                                        "ActionOnFailure": "CONTINUE",
                                        "Args": [
-                                           "--deploy-mode", "cluster", "s3://${S3_BUCKET}/monthly/22-11-2024/main.py",
+                                           "--deploy-mode", "cluster",
+                                            "--master", "yarn",
+                                            "s3://${S3_BUCKET}/monthly/22-11-2024/main.py",
                                            "--py-files","s3://${S3_BUCKET}/monthly/22-11-2024/py_files_22-11-2024.zip",
-                                           "--config", "s3a://${S3_BUCKET}/monthly/22-11-2024/configurations/config.json"
+                                           "--json_file_path", "s3a://${S3_BUCKET}/monthly/22-11-2024/configurations/config.json"
                                        ]
                                    }]' \
                                    --region ${REGION}
