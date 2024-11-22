@@ -82,33 +82,53 @@ pipeline {
             }
         }
         stage('Add Step to EMR Cluster') {
-                    steps {
-                        script {
-                           // Adding step to the running EMR cluster
-                           def addStepCommand = """
-                               aws emr add-steps \
-                                   --cluster-id ${env.CLUSTER_ID} \
-                                   --steps '[{
-                                       "Type": "Spark",
-                                       "Name": "${STEP_NAME}",
-                                       "ActionOnFailure": "CONTINUE",
-                                       "Args": [
-                                           "--deploy-mode", "cluster",
-                                           "--py-files","s3://${S3_BUCKET}/monthly/22-11-2024/py_files_22-11-2024.zip",
-                                           "s3://${S3_BUCKET}/monthly/22-11-2024/main.py",
-                                           "--json_file_path", "s3a://${S3_BUCKET}/monthly/22-11-2024/configurations/config.json"
-                                       ]
-                                   }]' \
-                                   --region ${REGION}
-                           """
+            steps {
+                script {
+                   // Adding step to the running EMR cluster
+                   def addStepCommand = """
+                       aws emr add-steps \
+                           --cluster-id ${env.CLUSTER_ID} \
+                           --steps '[{
+                               "Type": "Spark",
+                               "Name": "${STEP_NAME}",
+                               "ActionOnFailure": "CONTINUE",
+                               "Args": [
+                                   "--deploy-mode", "cluster",
+                                   "--py-files","s3://${S3_BUCKET}/monthly/22-11-2024/py_files_22-11-2024.zip",
+                                   "s3://${S3_BUCKET}/monthly/22-11-2024/main.py",
+                                   "--json_file_path", "s3a://${S3_BUCKET}/monthly/22-11-2024/configurations/config.json"
+                               ]
+                           }]' \
+                           --region ${REGION}
+                   """
+                   // Execute the add-steps command and capture the output
+                   def result = sh(script: addStepCommand, returnStdout: true).trim()
 
-                           sh addStepCommand
+                   // Log the output for debugging
+                   echo "Add step result: ${result}"
 
-                           echo "Step added to EMR Cluster ID: ${env.CLUSTER_ID}"
+                   // Extract the step ID from the result (assuming the output contains the Step ID)
+                   def stepId = result.tokenize(' ').find { it.startsWith('step-id=') }.split('=')[1]
 
+                   // Save the timestamp and step ID for later use
+                   def timestamp = new Date().format('yyyy-MM-dd HH:mm:ss')
+                   currentBuild.description = "Step added at: ${timestamp} with Step ID: ${stepId}"
 
-                        }
-                    }
+                   // Store the stepId as an environment variable for use in the next stage
+                   env.STEP_ID = stepId
+                   env.TIMESTAMP = timestamp
+
+                   echo "Step added to EMR Cluster ID: ${env.CLUSTER_ID} at ${timestamp}, Step ID: ${stepId}"
                 }
+            }
+        }
+        stage('Step Status'){
+            steps{
+                script{
+
+
+                }
+            }
+        }
     }
 }
