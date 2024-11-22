@@ -25,7 +25,6 @@ pipeline {
             steps {
                  script {
                      sh '''
-                     sudo apt install zip
                      echo "Zipping all .py files in monthly/22-11-2024..."
 
                      # Create a zip file containing all .py files in the directory
