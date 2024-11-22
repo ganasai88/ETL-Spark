@@ -61,5 +61,33 @@ pipeline {
                 }
             }
         }
+        stage('Add Step to EMR Cluster') {
+                    steps {
+                        script {
+                           // Adding step to the running EMR cluster
+                           def addStepCommand = """
+                               aws emr add-steps \
+                                   --cluster-id ${env.CLUSTER_ID} \
+                                   --steps '[{
+                                       "Type": "Spark",
+                                       "Name": "${STEP_NAME}",
+                                       "ActionOnFailure": "CONTINUE",
+                                       "Args": [
+                                           "--deploy-mode", "cluster", "s3://${S3_BUCKET}/monthly/22-11-2024/main.py",
+                                           "--py-files","s3://${S3_BUCKET}/monthly/22-11-2024/py_files_22-11-2024.zip",
+                                           "--config", "s3a://${S3_BUCKET}/monthly/22-11-2024/configurations/config.json"
+                                       ]
+                                   }]' \
+                                   --region ${REGION}
+                           """
+
+                           sh addStepCommand
+
+                           echo "Step added to EMR Cluster ID: ${env.CLUSTER_ID}"
+
+
+                        }
+                    }
+                }
     }
 }

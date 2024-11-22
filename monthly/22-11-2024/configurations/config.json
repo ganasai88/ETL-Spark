@@ -3,7 +3,7 @@
     {
       "source_type": "s3",
       "table_name": "Restaurant_Violations",
-      "file_path": "s3a://mynewsparkbucket/monthly/2024-11-16/input/Food_Establishment_Inspection_Data_20240717.csv"
+      "file_path": "s3a://etlspark/monthly/22-11-2024/Input/Food_Establishment_Inspection_Data_20240717.csv"
     }
   ],
   "transform": [
@@ -16,7 +16,7 @@
     {
       "source_type": "s3",
       "table_name": "result",
-      "file_path": "s3a://mynewsparkbucket/monthly/2024-11-16/output/"
+      "file_path": "s3a://etlspark/monthly/22-11-2024/output/"
     }
   ]
 }
