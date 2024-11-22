@@ -107,14 +107,11 @@ pipeline {
                    // Log the output for debugging
                    echo "Add step result: ${result}"
 
-                   // Parse the JSON output to get the step-id
-                   def stepId = null
-                   try {
-                       def jsonResponse = readJSON text: result
-                       stepId = jsonResponse.StepIds[0] // Extract the first step-id from the StepIds array
-                   } catch (Exception e) {
-                       error "Failed to parse the step ID from the response: ${e.message}"
-                   }
+                   // Parse the JSON output using Groovy's JsonSlurper
+                   def jsonResponse = new groovy.json.JsonSlurper().parseText(result)
+
+                   // Extract the step ID
+                   def stepId = jsonResponse.StepIds[0] // Extract the first step-id from the StepIds array
 
                    if (stepId) {
                        // Save the timestamp and step ID for later use
@@ -127,8 +124,8 @@ pipeline {
 
                        echo "Step added to EMR Cluster ID: ${env.CLUSTER_ID} at ${timestamp}, Step ID: ${stepId}"
                    } else {
-                       error "Step ID not found in the output"
-                   }
+                        error "Step ID not found in the output"
+                    }
                 }
             }
         }
