@@ -29,13 +29,13 @@ pipeline {
                      steps {
                          script {
                                  sh '''
-                                 docker run --rm -e SONAR_HOST_URL=http://18.117.71.55:9000/ \
+                                 docker run --rm -e SONAR_HOST_URL=http://3.15.147.90:9000/ \
                                  -e SONAR_LOGIN=sqp_8c2e771f33cbe36bb53dc30cb568db790a2736c7 \
                                  -v /var/lib/jenkins/workspace/Spark-Multi:/usr/src \
                                  sonarsource/sonar-scanner-cli \
                                  -Dsonar.projectKey=ETL-Pyspark \
                                  -Dsonar.sources=. \
-                                 -Dsonar.host.url=http://18.117.71.55:9000/ \
+                                 -Dsonar.host.url=http://3.15.147.90:9000/ \
                                  -Dsonar.login=sqp_8c2e771f33cbe36bb53dc30cb568db790a2736c7 \
                                  '''
                          }
