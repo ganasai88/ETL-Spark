@@ -58,7 +58,7 @@ pipeline {
                             cd ../..
 
                             # Sync the code to S3, include all files and exclude .git
-                            aws s3 sync . s3://${S3_BUCKET}/monthly/22-11-2024/ --exact-timestamps --exclude ".git/*"
+                            aws s3 sync . s3://${S3_BUCKET}/ --exact-timestamps --exclude ".git/*"
 
                             echo "Files uploaded successfully!"
                         '''
